@@ -36,19 +36,19 @@ GumboTag AferGumboNode::getTag() const
 	return node->v.element.tag;
 }
 
-std::map<std::string_view, std::string_view> AferGumboNode::getAttributes()
+std::map<std::string, std::string> AferGumboNode::getAttributes()
 {
 	loadAttributes();
 	return *attributes;
 }
 
-bool AferGumboNode::hasAttribute(const std::string_view& attr)
+bool AferGumboNode::hasAttribute(const std::string& attr)
 {
 	loadAttributes();
 	return attributes->contains(attr);
 }
 
-std::string_view AferGumboNode::getAttribute(const std::string_view& attr)
+std::string AferGumboNode::getAttribute(const std::string& attr)
 {
 	if (hasAttribute(attr)) return (*attributes)[attr];
 	else throw std::runtime_error("No such attribute '"+std::string(attr) + "'");
@@ -70,7 +70,7 @@ GumboParseFlags AferGumboNode::getParse_flags() const
 	return node->parse_flags;
 }
 
-std::string_view AferGumboNode::getText() const
+std::string AferGumboNode::getText() const
 {
 	if (node->type!=GUMBO_NODE_TEXT) 
 		throw std::runtime_error("Type of node isn't text. It's imposible to take text from it.");
@@ -78,7 +78,7 @@ std::string_view AferGumboNode::getText() const
 	auto str = std::string_view(node->v.text.text);
 	str.remove_prefix(str.find_first_not_of(" \n\t\r"));
 	str.remove_suffix(str.length() - str.find_last_not_of(" \n\t\r") - 1);
-	return  str;
+	return std::string(str);
 }
 
 std::vector< AferGumboNode> AferGumboNode::getChildren() const
@@ -121,7 +121,7 @@ AferGumboNode& AferGumboNode::operator=(const AferGumboNode& node)
 	return *this;
 }
 
-bool AferGumboNode::checkAttributes(const std::map<std::string_view, std::string_view>& attr)
+bool AferGumboNode::checkAttributes(const std::map<std::string, std::string>& attr)
 {
 	for (const auto& el : attr) {
 		if (hasAttribute(el.first) && getAttribute(el.first) != el.second) return false;
@@ -132,13 +132,13 @@ bool AferGumboNode::checkAttributes(const std::map<std::string_view, std::string
 void AferGumboNode::loadAttributes()
 {
 	if (attributes != nullptr) return;
-	attributes = new std::map<std::string_view, std::string_view>;
+	attributes = new std::map<std::string, std::string>;
 	if (node->type == GUMBO_NODE_TEXT) return;
 	const GumboVector* attr = &node->v.element.attributes;
 	auto& res = *attributes;
 	for (unsigned int i = 0; i < attr->length; ++i) {
 		GumboAttribute* temp = (GumboAttribute*)attr->data[i];
-		res[std::string_view(temp->name)] = std::string_view(temp->value);
+		res[std::string(temp->name)] = std::string(temp->value);
 	}
 
 

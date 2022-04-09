@@ -1,6 +1,6 @@
 #pragma once
 #include <gumbo.h>
-#include <string_view>
+#include <string>
 #include <iostream>
 #include <vector>
 #include <map>
@@ -20,21 +20,21 @@ public:
 	~AferGumboNode();
 	GumboNodeType getType() const;
 	GumboTag getTag() const;
-	std::map<std::string_view, std::string_view> getAttributes();
-	bool hasAttribute(const std::string_view& attr);
-	std::string_view getAttribute(const std::string_view& attr);
+	std::map<std::string, std::string> getAttributes();
+	bool hasAttribute(const std::string& attr);
+	std::string getAttribute(const std::string& attr);
 	AferGumboNode getParent() const;
 	size_t getIndex_within_parent() const;
 	GumboParseFlags getParse_flags() const;
-	std::string_view getText() const;
+	std::string getText() const;
 	std::vector<AferGumboNode> getChildren() const;
 	bool hasChildren() const;
 	AferGumboNode& operator=(const AferGumboNode& node);
 	friend std::ostream& operator<<(std::ostream &out, AferGumboNode &node);
 
 private:
-	bool checkAttributes(const std::map<std::string_view, std::string_view> &attr);
+	bool checkAttributes(const std::map<std::string, std::string> &attr);
 	void loadAttributes();
-	std::map<std::string_view, std::string_view> *attributes = nullptr;
+	std::map<std::string, std::string> *attributes = nullptr;
 
 };

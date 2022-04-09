@@ -8,7 +8,7 @@ afer_search_options::afer_search_options(AferGumboNode& node) {
     res.type = node.getType();
     if (res.type == GumboNodeType::GUMBO_NODE_ELEMENT) {
         res.tag = node.getTag();
-        std::map<std::string_view, std::string_view> all_attributes = node.getAttributes();
+        std::map<std::string, std::string> all_attributes = node.getAttributes();
 
         for (const auto& el : all_attributes) {
             if (!el.second.empty() && el.second[0] == '%')
@@ -28,8 +28,6 @@ afer_search_options::afer_search_options(AferGumboNode& node) {
     }
     else if (res.type == GumboNodeType::GUMBO_NODE_TEXT) {
         auto str = node.getText();
-        /*str.remove_prefix(str.find_first_not_of(" \n\t\r"));
-        str.remove_suffix(str.length()-str.find_last_not_of(" \n\t\r")-1);*/
         if (str[0] == '%')
             res.to_get["text"] = str.substr(1);
         else

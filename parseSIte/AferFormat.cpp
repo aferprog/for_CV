@@ -2,40 +2,14 @@
 #include <algorithm>
 #include <iostream>
 
-bool AferFormat::find_path_element(afer_search_options format, AferGumboNode& root) {
 
-    if (format.check(root)) return true;
-
-    // vector of vectors with nodes, wich must be checked
-    std::vector<std::vector<AferGumboNode>> vect0 = { root.getChildren() };
-    std::vector<std::vector<AferGumboNode>> vect1;
-
-
-    auto* temp_vect = &vect0;
-    auto* next_vect = &vect1;
-
-    while (temp_vect->size()>0) {
-        for (auto& vect : *temp_vect)
-            for (auto& node : vect) {
-                if (format.check(node)) {
-                    root = node;
-                    afer_search_options test(root);
-                    return true;
-                }
-                else if (node.hasChildren())
-                    next_vect->push_back(node.getChildren());
-            }
-
-        std::swap(temp_vect, next_vect);
-        next_vect->clear();
-    }
-}
 
 void AferFormat::find_all_by_recursion_help(std::vector<AferGumboNode>& res, const afer_search_options& format, AferGumboNode& node, int deep) {
     /*for (int i = 0; i < deep; ++i)
         std::cout << "  ";
     std::cout << node << std::endl;*/
-    if (format.check(node)) res.push_back(node);
+    if (format.check(node)) 
+        res.push_back(node);
     else {
         for (auto& el : node.getChildren())
             find_all_by_recursion_help(res, format, el, deep+1);
@@ -68,7 +42,7 @@ void AferFormat::build_entity(std::map<std::string, std::string>& entity, std::v
                 break;
             case GumboNodeType::GUMBO_NODE_ELEMENT:
                 for (auto& el : opt.to_get) {
-                    entity[std::string(el.second)] = std::string(node.getAttribute(el.first));
+                    entity[el.second] = node.getAttribute(el.first);
                 }
                 for (auto& child : node.getChildren()) {
                     auto children = format.getChildren();
@@ -88,40 +62,15 @@ void AferFormat::build_entity(std::map<std::string, std::string>& entity, std::v
     }
 }
 
-void AferFormat::go_by_entity_path(AferGumboNode &format, AferGumboNode &root)
+GumboOutput* AferFormat::open_source(std::string_view html_doc)
 {
-    while (!check_end_of_path(format)) {
-        if (find_path_element(format, root)) {
-            auto t= format.getChildren();
-            format = t[0];
-        }
-        else throw std::runtime_error("Not found path to root of entyties");
-    }
-
+    
+    return gumbo_parse_with_options(
+        &kGumboDefaultOptions, html_doc.data(), html_doc.length());
 }
-
-void AferFormat::open_source(const std::string& source_path)
+void AferFormat::close_source(GumboOutput* output)
 {
-    std::ifstream in(&source_path[0], std::ios::in | std::ios::binary);
-    if (!in) {
-        throw std::invalid_argument("Can't find the source-file with name '"+ std::string(source_path)+"'");
-    }
-
-    std::string contents;
-    in.seekg(0, std::ios::end);
-    contents.resize(in.tellg());
-    in.seekg(0, std::ios::beg);
-    in.read(&contents[0], contents.size());
-    in.close();
-
-    opt = kGumboDefaultOptions;
-
-    output = gumbo_parse_with_options(
-        &kGumboDefaultOptions, contents.data(), contents.length());
-}
-void AferFormat::close_source()
-{
-    gumbo_destroy_output(&opt, output);
+    gumbo_destroy_output(&kGumboDefaultOptions, output);
 }
 
 bool AferFormat::check_end_of_path(AferGumboNode& format)
@@ -139,6 +88,15 @@ bool AferFormat::check_end_of_path(AferGumboNode& format)
 
 }
 
+int AferFormat::count_of_parameters(AferGumboNode& node)
+{
+    int res = afer_search_options(node).to_get.size();
+    for (auto& child : node.getChildren())
+        res += count_of_parameters(child);
+    return res;
+}
+
+
 std::vector<AferGumboNode> AferFormat::find_entities_roots(AferGumboNode& format, AferGumboNode& root)
 {
     std::vector<AferGumboNode> vect0 = { root };
@@ -151,44 +109,54 @@ std::vector<AferGumboNode> AferFormat::find_entities_roots(AferGumboNode& format
     while (!check_end_of_path(format)) {
         
         for (auto& node : *temp_vect) {
-            auto temp_roots = find_all_by_recursion(format, root);
+            auto temp_roots = find_all_by_recursion(format, node);
             next_vect->insert(next_vect->end(), temp_roots.begin(), temp_roots.end());
         }
 
         std::swap(temp_vect, next_vect);
         next_vect->clear();
+        format = format.getChildren()[0];
     }
     for (auto& node : *temp_vect) {
-        auto temp_roots = find_all_by_recursion(format, root);
+        auto temp_roots = find_all_by_recursion(format, node);
         next_vect->insert(next_vect->end(), temp_roots.begin(), temp_roots.end());
     }
     return *next_vect;
 }
 
-void AferFormat::get_formated_enteties(const std::string& source_path, AferGumboNode root)
+std::vector<std::map<std::string, std::string>> AferFormat::get_formated_enteties(GumboOutput* format_output, GumboOutput* root_output, bool not_return)
 {
+    AferGumboNode format_root(format_output->root, true);
+    AferGumboNode root(root_output->root);
 
-    open_source(source_path);
-    
-    AferGumboNode format_root(output->root, true);
-    go_by_entity_path(format_root, root);
-    // find_all_by_recursion(format_root, root);
-    //std::vector<AferGumboNode> entities = find_entities_roots(format_root, root);
-    std::vector<AferGumboNode> entities = find_all_by_recursion(format_root, root);
-    std::cout << format_root<< std::endl;
-    std::cout << root<< std::endl<< std::endl;
-    std::cout << entities.size()<<"\n";
+    std::vector<AferGumboNode> entities = find_entities_roots(format_root, root);
+    int parameters_count = count_of_parameters(format_root);
+
+    std::cout << parameters_count << "\n";
 
     temp_entities.resize(entities.size());
     for (int i = 0; i < entities.size(); ++i)
         build_entity(temp_entities[i], { format_root }, entities[i]);
     
-    for (auto& ent : temp_entities) {
-        for (auto& pair : ent) {
-            std::cout << pair.first << " = " << pair.second << std::endl;
-        }
-        std::cout << std::endl;
-    }
+    auto border = std::remove_if(temp_entities.begin(), temp_entities.end(), [parameters_count](auto& entity) {
+        return entity.size() != parameters_count;
+        });
+    temp_entities.erase(border, temp_entities.end());
 
-    close_source();
+    if (not_return)
+        return {};
+    else
+        return temp_entities;
+}
+
+std::vector<std::map<std::string, std::string>> AferFormat::get_formated_enteties(std::string_view format, std::string_view html_page)
+{
+    GumboOutput* format_output = open_source(format);
+    GumboOutput* page_output = open_source(html_page);
+
+    get_formated_enteties(format_output, page_output, true);
+
+    close_source(page_output);
+    close_source(format_output);
+    return temp_entities;
 }

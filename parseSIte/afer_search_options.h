@@ -2,7 +2,7 @@
 #include <gumbo.h>
 #include "AferGumboNode.h"
 #include <map>
-#include <string_view>
+#include <string>
 #include <sstream>
 #include <vector>
 
@@ -16,9 +16,9 @@ enum AferProperties{
 struct afer_search_options {
 	GumboTag tag;
 	GumboNodeType type;
-	std::map<std::string_view, std::string_view> attributes;
+	std::map<std::string, std::string> attributes;
 	// what get where write it to
-	std::map<std::string_view, std::string_view> to_get;
+	std::map<std::string, std::string> to_get;
 	std::vector<char> additional_options;
 	afer_search_options(AferGumboNode& node);
 	bool check(AferGumboNode& node) const;

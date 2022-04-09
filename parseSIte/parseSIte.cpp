@@ -361,22 +361,14 @@ std::string loadData(std::string filename) {
 
 int main(int argc, char** argv) {
     
-    std::string contents = loadData("./html_tests/yakaboo_1.html");
-    // auto test = loadData("./parsing_format/youtube_1.html");
+    std::string page = loadData("./html_tests/yakaboo_2.html");
+    std::string format= loadData("./parsing_format/yakaboo_1.html");
 
+    auto books = AferFormat().get_formated_enteties(format.c_str(), page.c_str());
 
-
-    //contents = test;
-    // If you used contents.c_str(), it'd be harder to match up original
-    // positions, because c_str() creates a copy of the string and you can't do
-    // pointer arithmetic betweent contents.data() and the original_* pointers.
-    GumboOutput* output = gumbo_parse_with_options(
-        &kGumboDefaultOptions, contents.data(), contents.length());
-
-    //printHTML(AferGumboNode(output->root, true), 0);
-    //prettyprint(output->root, 0, "  ");
-    AferFormat().get_formated_enteties("./parsing_format/yakaboo_1.html", output->root);
-   
-
-    gumbo_destroy_output(&kGumboDefaultOptions, output);
+    for (const auto& book : books) {
+        for (const auto& pair : book)
+            std::cout << pair.first << " = " << pair.second << std::endl;
+        std::cout << std::endl;
+    }
 }
