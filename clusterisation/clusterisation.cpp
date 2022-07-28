@@ -3,15 +3,9 @@
 
 using namespace std;
 
-template <int x>
-void test() {
-    cout << x << endl;
-}
-
 int main()
 {
-    test<5>();
-    /*const size_t LEN = 3;
+    const size_t LEN = 3;
     const size_t COUNT = 8;
 
     vector<vector<double>> data;
@@ -25,9 +19,13 @@ int main()
     }
 
     aca::claster_config config;
-    aca::EntityDistance::distanceManhet(aca::Entity(2, 2), aca::Entity(3, 2));
-    aca::EntityDistance::distanceMinkov<(float)3>(aca::Entity(2, 2), aca::Entity(3, 2));
-    */
+    config.distance_between_clusters = aca::ClasterDistance::weigthCenter<aca::EntityDistance::distanceManhet>;
 
-    // std::cout << (size_t)(-1) << std::endl;
+    aca::Clasterisation clasterisation(data, config);
+    
+    vector<aca::Claster> clasters = clasterisation.devide_into_clasters_fraction(0.5);
+
+    /* 
+        Working with clasters...
+    */
 }
