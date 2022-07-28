@@ -12,8 +12,8 @@ int main()
 
     for (int i = 0; i < COUNT; i++) {
         data.push_back(vector<double>());
+        data[i].resize(LEN);
         for (int j = 0; j < LEN; j++) {
-            data[i].resize(LEN);
             cin >> data[i][j];
         }
     }
