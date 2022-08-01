@@ -78,18 +78,18 @@ std::vector <aca::Claster> aca::Clasterisation::devide_into_clasters_distance(do
         clasters[i].push_back(entities[i]);
     }
     
-    // double total_dist = 0;
+    size_t count = 0;
     for (const UnitingRecord& rec : main_history) {
-        // total_dist += rec.distance;
         if (rec.distance > distace) break;
+        count++;
 
         clasters[rec.claster_id_l].unite(clasters[rec.claster_id_r]);
         flags[rec.claster_id_r] = false;
     }
 
-    std::vector <aca::Claster> res;
-    for (size_t i = 0; i < entities.size(); i++)
-        if (flags[i]) res.push_back(clasters[i]);
+    std::vector <aca::Claster> res(entities.size()-count);
+    for (size_t i = 0, k=0; k < res.size(); i++)
+        if (flags[i]) res[k++]=std::move(clasters[i]);
 
     return res;
 }
