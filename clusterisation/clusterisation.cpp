@@ -29,7 +29,7 @@ int main()
         printf("(%lu; %lu) = %.3lf\n", el.claster_id_l+1, el.claster_id_r+1, el.distance);
     }
 
-    for (const auto& clast : clasterisation.devide_into_clasters_distance(200)) {
+    for (const auto& clast : clasterisation.devide_into_clasters_fraction(0.344f)) {
         cout<<clast<<endl;
     }
 

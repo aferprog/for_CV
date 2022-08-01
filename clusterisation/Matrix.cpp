@@ -55,7 +55,7 @@ void aca::Matrix::unite(size_t i, size_t j) {
     if (!(i < j))
         std::swap(i, j);
 
-    clasters[i].unite(clasters[j]);
+    clasters[i].unite(std::move(clasters[j]));
 
     clasters.erase(clasters.begin() + j);
     matrix.erase(matrix.begin() + j);
