@@ -10,10 +10,10 @@ namespace aca {
         std::vector<std::vector<double>> matrix;
         std::vector<Claster> clasters;
 
-        DistClasterFunc distance;
+        DistClasterFunc *distance;
 
     public:
-        Matrix(DistClasterFunc distance);
+        Matrix(DistClasterFunc *distance);
         size_t size() const;
         const std::vector<Claster>& getClasters() const;
         void addEntity(const Claster& ent);
@@ -22,3 +22,5 @@ namespace aca {
         void unite(size_t i, size_t j);
     };
 }
+
+std::ostream& operator<<(std::ostream& out, const aca::Matrix& arr);

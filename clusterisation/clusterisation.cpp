@@ -5,8 +5,8 @@ using namespace std;
 
 int main()
 {
-    const size_t LEN = 3;
-    const size_t COUNT = 8;
+    constexpr size_t LEN = 3;
+    constexpr size_t COUNT = 7;
 
     vector<vector<double>> data;
 
@@ -15,15 +15,25 @@ int main()
         data[i].resize(LEN);
         for (int j = 0; j < LEN; j++) {
             cin >> data[i][j];
+            cout << data[i][j]<< endl;
         }
+        cout << endl;
     }
 
     aca::claster_config config;
-    config.distance_between_clusters = aca::ClasterDistance::weigthCenter<aca::EntityDistance::distanceManhet>;
+    config.distance_between_clusters = new aca::ClasterDistance::AVGLinks(new aca::EntityDistance::Manhet());
 
     aca::Clasterisation clasterisation(data, config);
     
-    vector<aca::Claster> clasters = clasterisation.devide_into_clasters_fraction(0.5);
+    for (const aca::UnitingRecord& el : clasterisation.get_result()) {
+        printf("(%lu; %lu) = %.3lf\n", el.claster_id_l+1, el.claster_id_r+1, el.distance);
+    }
+
+    for (const auto& clast : clasterisation.devide_into_clasters_distance(200)) {
+        cout<<clast<<endl;
+    }
+
+    // vector<aca::Claster> clasters = clasterisation.devide_into_clasters_fraction(0.5);
 
     /* 
         Working with clasters...

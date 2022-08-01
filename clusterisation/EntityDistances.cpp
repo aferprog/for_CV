@@ -1,26 +1,23 @@
 #include "EntityDistances.h"
 
-double aca::EntityDistance::distanceEvklid(const Entity& l, const Entity& r) {
+double aca::EntityDistance::Evklid::distance(const Entity& l, const Entity& r) const
+{
     double sum = 0;
     for (int i = 0; i < l.size(); i++)
         sum += (l[i] - r[i]) * (l[i] - r[i]);
     return sqrt(sum);
 }
-template <float p>
-double aca::EntityDistance::distanceMinkov(const Entity& l, const Entity& r) {
-    double sum = 0;
-    for (int i = 0; i < l.size(); i++)
-        sum += pow(fabs(l[i] - r[i]), p);
-    double res = pow(sum, 1/p);
-    return res;
-}
-double aca::EntityDistance::distanceManhet(const Entity& l, const Entity& r) {
+
+double aca::EntityDistance::Manhet::distance(const Entity& l, const Entity& r) const
+{
     double sum = 0;
     for (int i = 0; i < l.size(); i++)
         sum += fabs(l[i] - r[i]);
     return sum;
 }
-double aca::EntityDistance::distanceChebish(const Entity& l, const Entity& r) {
+
+double aca::EntityDistance::Chebish::distance(const Entity& l, const Entity& r) const
+{
     double max = 0;
     for (size_t i = 0; i < l.size(); i++) {
         double t = abs(l[i] - r[i]);
@@ -28,4 +25,18 @@ double aca::EntityDistance::distanceChebish(const Entity& l, const Entity& r) {
             max = t;
     }
     return max;
+}
+
+aca::EntityDistance::Minkov::Minkov(float p)
+{
+    this->p = p;
+}
+
+double aca::EntityDistance::Minkov::distance(const Entity& l, const Entity& r) const
+{
+    double sum = 0;
+    for (int i = 0; i < l.size(); i++)
+        sum += pow(fabs(l[i] - r[i]), p);
+    double res = pow(sum, 1 / p);
+    return res;
 }

@@ -1,6 +1,6 @@
 #include "Matrix.h"
 
-aca::Matrix::Matrix(DistClasterFunc distance) {
+aca::Matrix::Matrix(DistClasterFunc *distance) {
     if (distance == nullptr)
         throw std::runtime_error("Empty function for counting distances between clusters");
     this->distance = distance;
@@ -20,7 +20,7 @@ void aca::Matrix::addEntity(const Claster& ent) {
     std::vector<double>& newLine = matrix[matrix.size() - 1];
 
     for (Claster& el : clasters)
-        newLine.push_back(distance(el, ent));
+        newLine.push_back(distance->distance(el, ent));
 
     newLine.push_back(0);
     clasters.push_back(ent);
@@ -37,7 +37,7 @@ void aca::Matrix::rebuild(size_t x) {
     }
     for (int i = 0; i < clasters.size(); i++) {
         if (x != i)
-            matrix[i][x] = matrix[x][i] = distance(clasters[x], clasters[i]);
+            matrix[i][x] = matrix[x][i] = distance->distance(clasters[x], clasters[i]);
     }
 }
 
@@ -63,4 +63,25 @@ void aca::Matrix::unite(size_t i, size_t j) {
         arr.erase(arr.begin() + j);
 
     rebuild(i);
+}
+
+std::ostream& operator<<(std::ostream& out, const aca::Matrix& arr) {
+    {
+        int i = 1;
+        for (const auto& claster : arr.getClasters()) {
+            out << "claster " << claster.getId() << ":\n";
+            for (const auto& ent : claster)
+                out << "   " << ent << '\n';
+        }
+    }
+    out << "---------------------------------------------\n";
+    for (int i = 0; i < arr.size(); i++) {
+        for (int j = 0; j < arr.size(); j++) {
+            printf("%.1lf\t", arr[i][j]);
+        }
+        out << '|' << std::endl;
+    }
+    out << "---------------------------------------------\n\n";
+    return out;
+
 }

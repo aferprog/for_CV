@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <algorithm>
 #include "Claster.h"
 #include "Entity.h"
 #include "Matrix.h"
@@ -11,7 +12,7 @@ namespace aca {
 	private:
 		double max_distance;
 		std::vector<UnitingRecord> main_history;
-		std::vector<Matrix> detales;
+		//std::vector<Matrix> detales;
 		std::vector<Entity> entities;
 	public:
 		Clasterisation(const std::vector<std::vector<double>>& data, claster_config config);

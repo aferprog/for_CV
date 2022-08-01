@@ -1,27 +1,29 @@
 #include "Clasterisation.h"
 
-aca::Clasterisation::Clasterisation(const std::vector<std::vector<double>>& data, claster_config config)
+aca::Clasterisation::Clasterisation(const std::vector<std::vector<double>>& data, claster_config config) //: detales(0)
 {
     if (config.distance_between_clusters == nullptr)
         throw std::runtime_error("No function to count distance");
     
     max_distance = 0;
-    detales.assign(0, 0);
     aca::Clasterisation &res=*this;
     
     const size_t n = data.size();
 
     Matrix matr(config.distance_between_clusters);
     for (int i = 0; i < n; i++) {
-        res.entities.push_back(Entity(i, data[0].size()));
+        res.entities.push_back(Entity(i, data[i].size()));
+        std::copy(data[i].begin(), data[i].end(), res.entities[i].begin());
         //en.fillRandomly();
         Claster cl;
-        cl.push_back(res.entities[0]);
+        cl.push_back(res.entities[i]);
         matr.addEntity(cl);
     }
 
     while (matr.size() > 1) {
         
+        std::cout << matr;
+
         struct { size_t i, j; } min = {0,1};
 
         for (size_t i=0; i+1<matr.size(); i++)
@@ -31,13 +33,9 @@ aca::Clasterisation::Clasterisation(const std::vector<std::vector<double>>& data
                     min.j = j;
                 }
 
-        main_history.push_back({min.i, min.j, matr[min.i][min.j]});
-
-        /*for (const auto& el : matr.getClasters()[min.first])
-            std::cout << "----" << el << std::endl;
-        for (const auto& el : matr.getClasters()[min.second])
-            std::cout << "----" << el << std::endl;*/
-
+        main_history.push_back({
+            matr.getClasters()[min.i].getId(), matr.getClasters()[min.j].getId(), matr[min.i][min.j]
+            });
         matr.unite(min.i, min.j);
     }
     max_distance = main_history[main_history.size() - 1].distance;
@@ -50,7 +48,8 @@ const std::vector<aca::UnitingRecord>& aca::Clasterisation::get_result()
 
 const std::vector<aca::Matrix>& aca::Clasterisation::get_detales()
 {
-    return detales;
+    //return detales;
+    throw 1;
 }
 
 const std::vector<aca::Entity>& aca::Clasterisation::get_entities()
@@ -76,12 +75,13 @@ std::vector <aca::Claster> aca::Clasterisation::devide_into_clasters_distance(do
 
     for (size_t i = 0; i < entities.size(); i++) {
         flags[i] = true;
+        clasters[i].push_back(entities[i]);
     }
     
-    double total_dist = 0;
+    // double total_dist = 0;
     for (const UnitingRecord& rec : main_history) {
-        total_dist += rec.distance;
-        if (total_dist > distace) break;
+        // total_dist += rec.distance;
+        if (rec.distance > distace) break;
 
         clasters[rec.claster_id_l].unite(clasters[rec.claster_id_r]);
         flags[rec.claster_id_r] = false;

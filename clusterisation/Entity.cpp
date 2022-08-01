@@ -27,6 +27,7 @@ std::ostream& operator<<(std::ostream& out, const aca::Entity& ent) {
     //    //char msg[50] = "Empty entity with id ";
     //    throw std::exception("Empty entity");
     //}
+    out << ent.getId()<<':';
     out << '(';
     if (ent.size() > 0) {
         for (int i = 0; i < ent.size() - 1; ++i)
