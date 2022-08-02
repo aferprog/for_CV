@@ -3,8 +3,8 @@
 #include "ClasterDistances.h"
 namespace aca {
 	struct claster_config {
-		bool safe_detales = false;
-		DistClasterFunc *distance_between_clusters = nullptr;
-		float additional_parameter = 0;
+		// bool safe_detales = false;
+		std::shared_ptr<DistClasterFunc> distance_between_clusters;
+		// float additional_parameter = 0;
 	};
 }

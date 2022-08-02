@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 #include "Claster.h"
 #include "EntityDistances.h"
 
@@ -7,27 +8,27 @@ using DistClasterFunc = double (*)(const aca::Claster&, const aca::Claster&);
 namespace aca {
 
     class DistClasterFunc {
-        const aca::DistElementFunc* element_distance;
+        std::shared_ptr<const aca::DistElementFunc> element_distance;
     public:
-        DistClasterFunc(const aca::DistElementFunc* element_distance);
-        virtual double distance_once(const Claster& l, const Claster& r);
-        virtual double distance_for_elements(const Entity& l, const Entity& r);
-        virtual double distance(const Claster& l, const Claster& r) = 0;
+        DistClasterFunc(const std::shared_ptr<const aca::DistElementFunc> element_distance);
+        virtual double distance_once(const Claster& l, const Claster& r) const;
+        virtual double distance_for_elements(const Entity& l, const Entity& r) const;
+        virtual double distance(const Claster& l, const Claster& r) const = 0;
     };
 
     namespace ClasterDistance {
         class AVGLinks : public DistClasterFunc {
         public:
-            AVGLinks(const aca::DistElementFunc* element_distance);
-            virtual double distance(const Claster& l, const Claster& r) override;
+            AVGLinks(const std::shared_ptr<const aca::DistElementFunc> element_distance);
+            virtual double distance(const Claster& l, const Claster& r) const override;
         };
 
         class WeightCenter : public DistClasterFunc {
         private:
-            aca::Entity avgImage(const Claster& claster);
+            aca::Entity avgImage(const Claster& claster) const;
         public:
-            WeightCenter(const aca::DistElementFunc* element_distance);
-            virtual double distance(const Claster& l, const Claster& r) override;
+            WeightCenter(const std::shared_ptr<const aca::DistElementFunc> element_distance);
+            virtual double distance(const Claster& l, const Claster& r) const override;
         };
     }
 

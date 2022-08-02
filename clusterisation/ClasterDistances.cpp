@@ -1,26 +1,26 @@
 #include "ClasterDistances.h"
 
-aca::DistClasterFunc::DistClasterFunc(const aca::DistElementFunc* element_distance)
+aca::DistClasterFunc::DistClasterFunc(const std::shared_ptr<const aca::DistElementFunc> element_distance)
 {
     this->element_distance = element_distance;
 }
 
-double aca::DistClasterFunc::distance_once(const Claster& l, const Claster& r)
+double aca::DistClasterFunc::distance_once(const Claster& l, const Claster& r) const
 {
     return element_distance->distance(l[0], r[0]);
 }
 
-double aca::DistClasterFunc::distance_for_elements(const Entity& l, const Entity& r)
+double aca::DistClasterFunc::distance_for_elements(const Entity& l, const Entity& r) const
 {
     return element_distance->distance(l, r);
 }
 
-aca::ClasterDistance::AVGLinks::AVGLinks(const aca::DistElementFunc* element_distance)
+aca::ClasterDistance::AVGLinks::AVGLinks(const std::shared_ptr<const aca::DistElementFunc> element_distance)
     :DistClasterFunc(element_distance)
 {
 }
 
-double aca::ClasterDistance::AVGLinks::distance(const Claster& l, const Claster& r)
+double aca::ClasterDistance::AVGLinks::distance(const Claster& l, const Claster& r) const
 {
     double sum = 0;
     for (const Entity& el1 : l)
@@ -29,7 +29,7 @@ double aca::ClasterDistance::AVGLinks::distance(const Claster& l, const Claster&
     return sum / (l.size() * r.size());
 }
 
-aca::Entity aca::ClasterDistance::WeightCenter::avgImage(const Claster& claster)
+aca::Entity aca::ClasterDistance::WeightCenter::avgImage(const Claster& claster) const
 {
     const size_t ENTITY_LENGHT = claster[0].size();
     Entity res(claster.getId(), ENTITY_LENGHT);
@@ -44,12 +44,12 @@ aca::Entity aca::ClasterDistance::WeightCenter::avgImage(const Claster& claster)
     return res;
 }
 
-aca::ClasterDistance::WeightCenter::WeightCenter(const aca::DistElementFunc* element_distance)
+aca::ClasterDistance::WeightCenter::WeightCenter(const std::shared_ptr<const aca::DistElementFunc> element_distance)
     :DistClasterFunc(element_distance)
 {
 }
 
-double aca::ClasterDistance::WeightCenter::distance(const Claster& l, const Claster& r)
+double aca::ClasterDistance::WeightCenter::distance(const Claster& l, const Claster& r) const
 {
     return distance_for_elements(avgImage(l), avgImage(r));
 }

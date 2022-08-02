@@ -10,10 +10,10 @@ namespace aca {
         std::vector<std::vector<double>> matrix;
         std::vector<Claster> clasters;
 
-        DistClasterFunc *distance;
+        std::shared_ptr<const DistClasterFunc> distance;
 
     public:
-        Matrix(DistClasterFunc *distance);
+        Matrix(const std::shared_ptr<const DistClasterFunc> distance);
         size_t size() const;
         const std::vector<Claster>& getClasters() const;
         void addEntity(const Claster& ent);

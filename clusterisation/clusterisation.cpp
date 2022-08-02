@@ -21,7 +21,9 @@ int main()
     }
 
     aca::claster_config config;
-    config.distance_between_clusters = new aca::ClasterDistance::AVGLinks(new aca::EntityDistance::Manhet());
+    auto elfunc = std::make_shared<aca::EntityDistance::Manhet>();
+    config.distance_between_clusters = std::make_shared<aca::ClasterDistance::AVGLinks>(elfunc);
+    
 
     aca::Clasterisation clasterisation(data, config);
     

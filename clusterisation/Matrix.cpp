@@ -1,6 +1,6 @@
 #include "Matrix.h"
 
-aca::Matrix::Matrix(DistClasterFunc *distance) {
+aca::Matrix::Matrix(const std::shared_ptr<const DistClasterFunc> distance) {
     if (distance == nullptr)
         throw std::runtime_error("Empty function for counting distances between clusters");
     this->distance = distance;
